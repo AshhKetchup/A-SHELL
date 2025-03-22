@@ -1,6 +1,7 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::collections::HashMap;
+use pathsearch::find_executable_in_path;
 
 trait ShellCommand{
     fn execute(&self, args: &[&str]);
@@ -22,6 +23,29 @@ impl ShellCommand for Exit{
     }
 }
 
+fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
+    let mut parts = input.split_whitespace();
+    if let Some(command) = parts.next() {
+            let args: Vec<&str> = parts.collect();
+            if command == "type" && !args.is_empty() {
+                if commands.get(args[0]).is_some() || args[0] == "type" {
+                    println!("{} is a shell builtin", args[0]);
+                }
+                else{
+                    println!("{}: not found", args[0]);
+                }
+            }else{
+                if let Some(cmd) = commands.get(command){
+                    cmd.execute(&args);
+                }
+                else{
+                    println!("{}: command not found", command);
+                }
+            }
+    }
+
+}
+
 fn main() {
     // Uncomment this block to pass the first stage
     let mut commands: HashMap<&str, Box<dyn ShellCommand>> = HashMap::new();
@@ -37,25 +61,6 @@ fn main() {
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
         let input = input.trim();
-
-        let mut parts = input.split_whitespace();
-        if let Some(command) = parts.next() {
-            let args: Vec<&str> = parts.collect();
-            if command == "type" {
-                if commands.get(args[0]).is_some() || args[0] == "type" {
-                    println!("{} is a shell builtin", args[0]);
-                }
-                else{
-                    println!("{}: not found", args[0]);
-                }
-            }else{
-                if let Some(cmd) = commands.get(command){
-                    cmd.execute(&args);
-                }
-                else{
-                    println!("{}: command not found", command);
-                }
-            }
-        }
+        parse(input, &commands);
     }
 }
