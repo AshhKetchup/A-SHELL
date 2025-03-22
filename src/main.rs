@@ -29,12 +29,16 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
             let args: Vec<&str> = parts.collect();
             if command == "type" && !args.is_empty() {
                 if commands.get(args[0]).is_some() || args[0] == "type" {
-                    println!("{} is a shell builtin", args[0]);
+                    println!("{} is a shell builtin", args[0])
+                }
+                else if let Some(path) = find_executable_in_path(args[0]){
+                        println!("{} is {}", args[0], path.to_str().unwrap());
                 }
                 else{
                     println!("{}: not found", args[0]);
                 }
-            }else{
+            }
+            else{
                 if let Some(cmd) = commands.get(command){
                     cmd.execute(&args);
                 }
@@ -43,7 +47,6 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
                 }
             }
     }
-
 }
 
 fn main() {
