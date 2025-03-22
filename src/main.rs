@@ -13,7 +13,8 @@ fn main() {
         stdin.read_line(&mut input).unwrap();
         println!("{}: command not found", input.trim());
 
-        if input.trim() == "exit 0":
+        if input.trim() == "exit 0"{
             break;
+        }
     }
 }
