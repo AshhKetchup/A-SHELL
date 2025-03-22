@@ -2,6 +2,7 @@
 use std::io::{self, Write};
 use std::collections::HashMap;
 use pathsearch::find_executable_in_path;
+use std::process::Command;
 
 trait ShellCommand{
     fn execute(&self, args: &[&str]);
@@ -23,29 +24,44 @@ impl ShellCommand for Exit{
     }
 }
 
+fn externalcmd(cmd: &str, args: &Vec<&str>){
+    if let Some(path) = find_executable_in_path(cmd){
+        let status = Command::new(path).args(args).spawn().expect("Failed to execute command").wait();
+
+        if let Err(e) = status{
+            println!("Error: {}", e);
+        }
+    } 
+    else{
+        println!("{}: command not found", cmd);
+    }
+}
+
 fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
     let mut parts = input.split_whitespace();
+
     if let Some(command) = parts.next() {
-            let args: Vec<&str> = parts.collect();
-            if command == "type" && !args.is_empty() {
-                if commands.get(args[0]).is_some() || args[0] == "type" {
-                    println!("{} is a shell builtin", args[0])
-                }
-                else if let Some(path) = find_executable_in_path(args[0]){
-                        println!("{} is {}", args[0], path.to_str().unwrap());
-                }
-                else{
-                    println!("{}: not found", args[0]);
-                }
-            }
-            else{
-                if let Some(cmd) = commands.get(command){
-                    cmd.execute(&args);
-                }
-                else{
-                    println!("{}: command not found", command);
+        let args: Vec<&str> = parts.collect();
+
+        match command {
+            "type" if !args.is_empty() => {
+                let cmd_name = args[0];
+
+                match commands.get(cmd_name) {
+                    Some(_) => println!("{} is a shell builtin", cmd_name),
+                    None => match find_executable_in_path(cmd_name) {
+                        Some(path) => println!("{} is {}", cmd_name, path.to_str().unwrap()),
+                        None => println!("{}: not found", cmd_name),
+                    },
                 }
             }
+            _ => match commands.get(command) {
+                Some(cmd) => cmd.execute(&args),
+                None => {
+                    externalcmd(command, &args);
+                }
+            },
+        }
     }
 }
 
