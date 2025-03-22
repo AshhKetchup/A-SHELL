@@ -13,11 +13,21 @@ impl ShellCommand for Echo{
     }
 }
 
+struct Exit;
+impl ShellCommand for Exit{
+    fn execute(&self, args: &[&str]){
+        if !args.is_empty() && args[0] == "0"{
+            std::process::exit(0);
+        }
+    }
+}
+
 fn main() {
     // Uncomment this block to pass the first stage
     let mut commands: HashMap<&str, Box<dyn ShellCommand>> = HashMap::new();
     commands.insert("echo", Box::new(Echo));
-
+    commands.insert("exit", Box::new(Exit));
+    
     loop{
         print!("$ ");
         io::stdout().flush().unwrap();
@@ -31,19 +41,20 @@ fn main() {
         let mut parts = input.split_whitespace();
         if let Some(command) = parts.next() {
             let args: Vec<&str> = parts.collect();
-            if command == "exit"{
-                if !args.is_empty() && args[0] == "0"{
-                    break;
+            if command == "type" {
+                if commands.get(args[0]).is_some() {
+                    println!("{} is a shell builtin", args[0]);
                 }
                 else{
-                    continue;
+                    println!("{}: not found", args[0]);
                 }
-            }
-            if let Some(cmd) = commands.get(command){
-                cmd.execute(&args);
-            }
-            else{
-                println!("{}: command not found", command);
+            }else{
+                if let Some(cmd) = commands.get(command){
+                    cmd.execute(&args);
+                }
+                else{
+                    println!("{}: command not found", command);
+                }
             }
         }
     }
