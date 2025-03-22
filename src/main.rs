@@ -42,7 +42,7 @@ fn main() {
         if let Some(command) = parts.next() {
             let args: Vec<&str> = parts.collect();
             if command == "type" {
-                if commands.get(args[0]).is_some() {
+                if commands.get(args[0]).is_some() || args[0] == "type" {
                     println!("{} is a shell builtin", args[0]);
                 }
                 else{
