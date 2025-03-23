@@ -3,6 +3,7 @@ use std::io::{self, Write};
 use std::collections::HashMap;
 use pathsearch::find_executable_in_path;
 use std::process::Command;
+use std::path::Path;
 
 trait ShellCommand{
     fn execute(&self, args: &[&str]);
@@ -24,16 +25,19 @@ impl ShellCommand for Exit{
     }
 }
 
-fn externalcmd(cmd: &str, args: &Vec<&str>){
-    if let Some(path) = find_executable_in_path(cmd){
-        let status = Command::new(path).args(args).spawn().expect("Failed to execute command").wait();
+fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
+    let exe_path = find_executable_in_path(cmd)
+        .or_else(|| Some(Path::new(cmd).to_path_buf()))
+        .filter(|path| path.exists() && path.is_file());
 
-        if let Err(e) = status{
-            println!("Error: {}", e);
-        }
+    if let Some(path) = exe_path {
+        let mut child = Command::new(path).args(args).spawn().map_err(|err| err.to_string());
+
+        child.wait().map_err(|err| err.tp_string())?;
+        Ok(())
     } 
     else{
-        println!("{}: command not found", cmd);
+        Err(Format!("{}: command not found", cmd))
     }
 }
 
