@@ -37,6 +37,7 @@ fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
         Ok(())
     } 
     else{
+        println!("{}: command not found", cmd);
         Err(format!("{}: command not found", cmd))
     }
 }
