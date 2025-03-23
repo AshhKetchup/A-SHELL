@@ -31,7 +31,7 @@ fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
         .filter(|path| path.exists() && path.is_file());
 
     if let Some(path) = exe_path {
-        let mut child = Command::new(path).args(args).spawn().map_err(|err| err.to_string());
+        let mut child = Command::new(cmd).args(args).spawn().map_err(|err| err.to_string());
 
         child?.wait().map_err(|err| err.to_string())?;
         Ok(())
