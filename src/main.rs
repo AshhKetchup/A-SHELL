@@ -3,8 +3,9 @@ use std::io::{self, Write};
 use std::collections::HashMap;
 use pathsearch::find_executable_in_path;
 use std::process::Command;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::env;
+use dirs;
 
 trait ShellCommand{
     fn execute(&self, args: &[&str]);
@@ -39,8 +40,17 @@ impl ShellCommand for Pwd{
 struct Cd;
 impl ShellCommand for Cd{
     fn execute(&self, args: &[&str]){
-        let path = Path::new(args[0]);
+        let path = if args[0] == "~"{
+            dirs::home_dir()
+        }
+        else if args[0].starts_with("~/"){
+            dirs::home_dir().map(|home| home.join(args[0].trim_start_matches("`/")))
+        }
+        else{
+            Some(PathBuf::from(args[0]))
+        };
 
+        if let Some(path) = path { 
         if let Err(e) = env::set_current_dir(&path){
             let e = match e.kind() {
                 io::ErrorKind::NotFound => "No such file or directory",
@@ -48,6 +58,10 @@ impl ShellCommand for Cd{
                 _ => "an error occured",
             };
             println!("cd: {}: {}", args[0], e);
+        }
+        }
+        else {
+            eprintln!("cd: could not determine home directory");
         }
     }
 }
