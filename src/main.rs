@@ -52,6 +52,7 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
                 let cmd_name = args[0];
 
                 match commands.get(cmd_name) {
+                    "type" => println!("type is a shell builtin");
                     Some(_) => println!("{} is a shell builtin", cmd_name),
                     None => match find_executable_in_path(cmd_name) {
                         Some(path) => println!("{} is {}", cmd_name, path.to_str().unwrap()),
