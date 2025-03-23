@@ -30,8 +30,8 @@ fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
         .or_else(|| Some(Path::new(cmd).to_path_buf()))
         .filter(|path| path.exists() && path.is_file());
 
-    if let Some(path) = exe_path {
-        let mut child = Command::new(cmd).args(args).spawn().map_err(|err| err.to_string());
+    if let Some(_path) = exe_path {
+        let child = Command::new(cmd).args(args).spawn().map_err(|err| err.to_string());
 
         child?.wait().map_err(|err| err.to_string())?;
         Ok(())
@@ -50,14 +50,17 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
         match command {
             "type" if !args.is_empty() => {
                 let cmd_name = args[0];
-
+                if cmd_name == "type"{
+                    println!("type is a shell builtin")
+                }
+                else{
                 match commands.get(cmd_name) {
-                    "type" => println!("type is a shell builtin");
                     Some(_) => println!("{} is a shell builtin", cmd_name),
                     None => match find_executable_in_path(cmd_name) {
                         Some(path) => println!("{} is {}", cmd_name, path.to_str().unwrap()),
                         None => println!("{}: not found", cmd_name),
                     },
+                }
                 }
             }
             _ => match commands.get(command) {
