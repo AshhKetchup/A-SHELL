@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use pathsearch::find_executable_in_path;
 use std::process::Command;
 use std::path::Path;
+use std::env;
 
 trait ShellCommand{
     fn execute(&self, args: &[&str]);
@@ -24,6 +25,17 @@ impl ShellCommand for Exit{
         }
     }
 }
+
+struct Pwd;
+impl ShellCommand for Pwd{
+    fn execute(&self, args: &[&str]){
+        match env::current_dir(){
+            Ok(path) => println!("{}", path.display()),
+            Err(e) => println!("pwd: error: {}", e),
+        }
+    }
+}
+
 
 fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
     let exe_path = find_executable_in_path(cmd)
@@ -78,7 +90,7 @@ fn main() {
     let mut commands: HashMap<&str, Box<dyn ShellCommand>> = HashMap::new();
     commands.insert("echo", Box::new(Echo));
     commands.insert("exit", Box::new(Exit));
-    
+    commands.insert("pwd", Box::new(Pwd)); 
     loop{
         print!("$ ");
         io::stdout().flush().unwrap();
