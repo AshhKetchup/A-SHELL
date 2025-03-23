@@ -28,7 +28,7 @@ impl ShellCommand for Exit{
 
 struct Pwd;
 impl ShellCommand for Pwd{
-    fn execute(&self, args: &[&str]){
+    fn execute(&self, _args: &[&str]){
         match env::current_dir(){
             Ok(path) => println!("{}", path.display()),
             Err(e) => println!("pwd: error: {}", e),
@@ -42,6 +42,11 @@ impl ShellCommand for Cd{
         let path = Path::new(args[0]);
 
         if let Err(e) = env::set_current_dir(&path){
+            let e = match e.kind() {
+                io::ErrorKind::NotFound => "No such file or directory",
+                io::ErrorKind::PermissionDenied => "Permission denied",
+                _ => "an error occured",
+            };
             println!("cd: {}: {}", args[0], e);
         }
     }
