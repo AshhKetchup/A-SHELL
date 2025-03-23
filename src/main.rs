@@ -66,7 +66,6 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
 }
 
 fn main() {
-    // Uncomment this block to pass the first stage
     let mut commands: HashMap<&str, Box<dyn ShellCommand>> = HashMap::new();
     commands.insert("echo", Box::new(Echo));
     commands.insert("exit", Box::new(Exit));
