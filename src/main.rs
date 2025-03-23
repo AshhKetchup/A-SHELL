@@ -36,6 +36,16 @@ impl ShellCommand for Pwd{
     }
 }
 
+struct Cd;
+impl ShellCommand for Cd{
+    fn execute(&self, args: &[&str]){
+        let path = Path::new(args[0]);
+
+        if let Err(e) = env::set_current_dir(&path){
+            println!("cd: {}: {}", args[0], e);
+        }
+    }
+}
 
 fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
     let exe_path = find_executable_in_path(cmd)
@@ -91,6 +101,7 @@ fn main() {
     commands.insert("echo", Box::new(Echo));
     commands.insert("exit", Box::new(Exit));
     commands.insert("pwd", Box::new(Pwd)); 
+    commands.insert("cd", Box::new(Cd));
     loop{
         print!("$ ");
         io::stdout().flush().unwrap();
