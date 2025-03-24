@@ -11,52 +11,40 @@ impl<'a> InputParser<'a> {
         }
     }
 
-    fn parse(&mut self) -> Vec<&'a str> {
+    fn parse(&mut self) -> Vec<String> {
         let mut result = Vec::new();
-        let mut start = None;
+        let mut current = String::new();
         let mut in_quotes = false;
 
         while let Some(&c) = self.iter.peek() {
             match c {
                 '\'' => {
-                    self.iter.next(); // Consume the quote
-                    if in_quotes {
-                        // If closing quote, store the collected part (excluding quotes)
-                        if let Some(s) = start {
-                            result.push(&self.input[s..self.input.len() - self.iter.clone().count() - 1]);
-                            start = None;
-                        }
-                    } else {
-                        // If opening quote, start collecting from next character
-                        start = Some(self.input.len() - self.iter.clone().count());
-                    }
-                    in_quotes = !in_quotes;
+                    self.iter.next(); // Consume quote
+                    in_quotes = !in_quotes; // Toggle quote state
                 }
                 ' ' if !in_quotes => {
-                    if let Some(s) = start {
-                        result.push(&self.input[s..self.input.len() - self.iter.clone().count()]);
-                        start = None;
+                    if !current.is_empty() {
+                        result.push(current.clone());
+                        current.clear();
                     }
-                    self.iter.next(); // Consume the space
+                    self.iter.next(); // Consume space
                 }
                 _ => {
-                    if start.is_none() {
-                        start = Some(self.input.len() - self.iter.clone().count());
-                    }
-                    self.iter.next(); // Consume the character
+                    current.push(c);
+                    self.iter.next(); // Consume character
                 }
             }
         }
 
-        // Push the last segment if it's not empty
-        if let Some(s) = start {
-            result.push(&self.input[s..]);
+        // Push last argument if exists
+        if !current.is_empty() {
+            result.push(current);
         }
 
         result
     }
 }
 
-pub fn parse_input(input: &str) -> Vec<&str> {
+pub fn parse_input(input: &str) -> Vec<String> {
     InputParser::new(input).parse()
 }
