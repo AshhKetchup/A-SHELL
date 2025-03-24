@@ -4,24 +4,29 @@ use std::collections::HashMap;
 use pathsearch::find_executable_in_path;
 
 mod commands;
+mod util;
 
 use commands::{ShellCommand, Echo, Exit, Cd, Pwd};
 use commands::externalcmd::externalcmd;
 
 fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
-    let mut parts = input.split_whitespace();
-   
+    let mut parts: Vec<&str>= util::parse_input(input);
+    println!("{:?}", parts);
 
-    if let Some(command) = parts.next() {
-        let args: Vec<&str> = parts.collect();
+    if parts.is_empty() {
+        return;
+    }
 
-        match command {
-            "type" if !args.is_empty() => {
-                let cmd_name = args[0];
-                if cmd_name == "type"{
-                    println!("type is a shell builtin")
-                }
-                else{
+    let command = parts[0];
+    let args: Vec<&str> = parts[1..].to_vec();
+    //println!("{:?}", command);
+    //println!("args: {:?}", args);
+    match command {
+        "type" if !args.is_empty() => {
+            let cmd_name = args[0];
+            if cmd_name == "type" {
+                //println!("type is a shell builtin")
+            } else {
                 match commands.get(cmd_name) {
                     Some(_) => println!("{} is a shell builtin", cmd_name),
                     None => match find_executable_in_path(cmd_name) {
@@ -29,15 +34,18 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
                         None => println!("{}: not found", cmd_name),
                     },
                 }
-                }
             }
-            _ => match commands.get(command) {
-                Some(cmd) => cmd.execute(&args),
-                None => {
-                    externalcmd(command, &args);
-                }
-            },
         }
+        _ => match commands.get(command) {
+            Some(cmd) => {
+                //println!("{} is a shell cmd", command);
+                cmd.execute(&args)
+            },
+            None => {
+                //println!("{}: not in commands", command);
+                externalcmd(command, &args).expect("Failed to execute command(external)");
+            }
+        },
     }
 }
 

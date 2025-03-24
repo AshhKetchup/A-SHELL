@@ -8,6 +8,9 @@ use dirs;
 pub struct Cd;
 impl ShellCommand for Cd{
     fn execute(&self, args: &[&str]){
+        if args.len() == 0 {
+            return;
+        }
         let path = if args[0] == "~"{
             dirs::home_dir()
         }
