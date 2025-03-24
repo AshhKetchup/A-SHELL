@@ -10,15 +10,15 @@ use commands::{ShellCommand, Echo, Exit, Cd, Pwd};
 use commands::externalcmd::externalcmd;
 
 fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
-    let mut parts: Vec<&str>= util::parse_input(input);
+    let mut parts: Vec<String>= util::parse_input(input);
     //println!("{:?}", parts);
 
     if parts.is_empty() {
         return;
     }
 
-    let command = parts[0];
-    let args: Vec<&str> = parts[1..].to_vec();
+    let command = parts[0].as_str();
+    let args: Vec<&str> = parts.iter().skip(1).map(String::as_str).collect();
     //println!("{:?}", command);
     //println!("args: {:?}", args);
     match command {
