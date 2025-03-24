@@ -11,7 +11,7 @@ use commands::externalcmd::externalcmd;
 
 fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
     let mut parts: Vec<&str>= util::parse_input(input);
-    println!("{:?}", parts);
+    //println!("{:?}", parts);
 
     if parts.is_empty() {
         return;
