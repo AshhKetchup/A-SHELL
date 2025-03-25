@@ -22,18 +22,22 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
     //println!("{:?}", command);
     //println!("args: {:?}", args);
     match command {
-        "type" if !args.is_empty() => {
-            let cmd_name = args[0];
-            if cmd_name == "type" {
-                //println!("type is a shell builtin")
-            } else {
-                match commands.get(cmd_name) {
-                    Some(_) => println!("{} is a shell builtin", cmd_name),
-                    None => match find_executable_in_path(cmd_name) {
-                        Some(path) => println!("{} is {}", cmd_name, path.to_str().unwrap()),
-                        None => println!("{}: not found", cmd_name),
-                    },
+        "type" => { if !args.is_empty() {
+                let cmd_name = args[0];
+                if cmd_name == "type" || cmd_name == "echo" {
+                    println!("{cmd_name} is a shell builtin")
+                } else {
+                    match commands.get(cmd_name) {
+                        Some(_) => println!("{} is a shell builtin", cmd_name),
+                        None => match find_executable_in_path(cmd_name) {
+                            Some(path) => println!("{} is {}", cmd_name, path.to_str().unwrap()),
+                            None => println!("{}: not found", cmd_name),
+                        },
+                    }
                 }
+            }
+            else {
+                println!("no args for {}", command);
             }
         }
         "echo" => {
