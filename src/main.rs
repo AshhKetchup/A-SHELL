@@ -36,6 +36,10 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
                 }
             }
         }
+        "echo" => {
+            let echo = Echo;
+            echo.execute(input);
+        }
         _ => match commands.get(command) {
             Some(cmd) => {
                 //println!("{} is a shell cmd", command);
@@ -51,7 +55,6 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
 
 fn main() {
     let mut commands: HashMap<&str, Box<dyn ShellCommand>> = HashMap::new();
-    commands.insert("echo", Box::new(Echo));
     commands.insert("exit", Box::new(Exit));
     commands.insert("pwd", Box::new(Pwd)); 
     commands.insert("cd", Box::new(Cd));
