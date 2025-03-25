@@ -9,49 +9,40 @@ impl Echo {
 
         let mut in_single_quotes = false;
         let mut in_double_quotes = false;
-        let mut prev_was_quote = false;
+        let mut escaped = false;
 
         while let Some(c) = chars.next() {
+            if escaped {
+                // Preserve the character as-is after a backslash
+                temp.push(c);
+                escaped = false;
+                continue;
+            }
+
             match c {
-                '\'' if !in_double_quotes => {
-                    if in_single_quotes {
-                        // Closing single quote
-                        in_single_quotes = false;
-                        prev_was_quote = true;
+                '\\' => {
+                    if !in_single_quotes && !in_double_quotes {
+                        escaped = true; // Escape next character outside of single quotes
                     } else {
-                        // Opening single quote
-                        in_single_quotes = true;
-                        prev_was_quote = false;
+                        temp.push(c);
                     }
+                }
+                '\'' if !in_double_quotes => {
+                    in_single_quotes = !in_single_quotes; // Toggle single-quoted state
                 }
                 '"' if !in_single_quotes => {
-                    if in_double_quotes {
-                        // Closing double quote
-                        in_double_quotes = false;
-                        prev_was_quote = true;
-                    } else {
-                        // Opening double quote
-                        in_double_quotes = true;
-                        prev_was_quote = false;
-                    }
+                    in_double_quotes = !in_double_quotes; // Toggle double-quoted state
+                }
+                ' ' if !in_single_quotes && !in_double_quotes && temp.is_empty() => {
+                    continue; // Ignore leading spaces
                 }
                 ' ' if !in_single_quotes && !in_double_quotes => {
-                    if !temp.is_empty() {
-                        result.push(temp.clone());
-                        temp.clear();
-                    }
-                    prev_was_quote = false;
+                    // Push accumulated word
+                    result.push(temp.clone());
+                    temp.clear();
                 }
                 _ => {
-                    if prev_was_quote {
-                        // Adjacent quoted strings should be merged without space
-                        if !temp.is_empty() {
-                            result.push(temp.clone());
-                            temp.clear();
-                        }
-                    }
                     temp.push(c);
-                    prev_was_quote = false;
                 }
             }
         }
