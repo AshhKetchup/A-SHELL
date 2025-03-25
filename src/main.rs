@@ -51,7 +51,7 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
             },
             None => {
                 //println!("{}: not in commands", command);
-                externalcmd(command, &args).expect("Failed to execute command(external)");
+                externalcmd(command, &args);
             }
         },
     }
