@@ -2,12 +2,19 @@
 use std::io::{self, Write};
 use std::collections::HashMap;
 use pathsearch::find_executable_in_path;
-
+use std::path::{Path, PathBuf};
 mod commands;
 mod util;
 
 use commands::{ShellCommand, Echo, Exit, Cd, Pwd};
 use commands::externalcmd::externalcmd;
+
+fn find_executable(cmd_name: &str) -> Option<PathBuf> {
+    if Path::new(cmd_name).exists() {
+        return Some(PathBuf::from(cmd_name));
+    }
+    find_executable_in_path(cmd_name)
+}
 
 fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
     let mut parts: Vec<String>= util::parse_input(input);
@@ -29,7 +36,7 @@ fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
                 } else {
                     match commands.get(cmd_name) {
                         Some(_) => println!("{} is a shell builtin", cmd_name),
-                        None => match find_executable_in_path(cmd_name) {
+                        None => match find_executable(cmd_name) {
                             Some(path) => println!("{} is {}", cmd_name, path.to_str().unwrap()),
                             None => println!("{}: not found", cmd_name),
                         },
