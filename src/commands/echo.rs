@@ -5,24 +5,37 @@ impl Echo {
         let rest = input.strip_prefix("echo ").unwrap_or(input);
         let mut result = Vec::new();
         let mut temp = String::new();
-        let mut in_quotes = false;
         let mut chars = rest.chars().peekable();
+
+        let mut in_single_quotes = false;
+        let mut in_double_quotes = false;
         let mut prev_was_quote = false;
 
         while let Some(c) = chars.next() {
             match c {
-                '\'' => {
-                    if in_quotes {
-                        // Closing quote
-                        in_quotes = false;
+                '\'' if !in_double_quotes => {
+                    if in_single_quotes {
+                        // Closing single quote
+                        in_single_quotes = false;
                         prev_was_quote = true;
                     } else {
-                        // Opening quote
-                        in_quotes = true;
+                        // Opening single quote
+                        in_single_quotes = true;
                         prev_was_quote = false;
                     }
                 }
-                ' ' if !in_quotes => {
+                '"' if !in_single_quotes => {
+                    if in_double_quotes {
+                        // Closing double quote
+                        in_double_quotes = false;
+                        prev_was_quote = true;
+                    } else {
+                        // Opening double quote
+                        in_double_quotes = true;
+                        prev_was_quote = false;
+                    }
+                }
+                ' ' if !in_single_quotes && !in_double_quotes => {
                     if !temp.is_empty() {
                         result.push(temp.clone());
                         temp.clear();
