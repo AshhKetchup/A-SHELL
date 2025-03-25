@@ -3,51 +3,50 @@ pub struct Echo;
 impl Echo {
     pub fn execute(&self, input: &str) {
         let rest = input.strip_prefix("echo ").unwrap_or(input);
-        let mut result = String::new();
+        let mut result = Vec::new();
         let mut temp = String::new();
         let mut in_quotes = false;
-        let mut last_was_quoted = false;
-        let mut space_buffer = false;
         let mut chars = rest.chars().peekable();
+        let mut prev_was_quote = false;
 
         while let Some(c) = chars.next() {
             match c {
                 '\'' => {
                     if in_quotes {
-                        // Closing a quoted section
+                        // Closing quote
                         in_quotes = false;
-                        result.push_str(&temp);
-                        temp.clear();
-                        last_was_quoted = true;
+                        prev_was_quote = true;
                     } else {
-                        // Opening a quoted section
+                        // Opening quote
                         in_quotes = true;
-                        if !result.is_empty() && !last_was_quoted {
-                            result.push(' '); // Ensure single space before new quoted section
-                        }
+                        prev_was_quote = false;
                     }
                 }
                 ' ' if !in_quotes => {
-                    if last_was_quoted {
-                        result.push(' '); // Ensure single space after quoted strings
-                        last_was_quoted = false;
+                    if !temp.is_empty() {
+                        result.push(temp.clone());
+                        temp.clear();
                     }
-                    space_buffer = true;
-                }
-                _ if in_quotes => {
-                    temp.push(c);
+                    prev_was_quote = false;
                 }
                 _ => {
-                    if space_buffer && !result.is_empty() {
-                        result.push(' '); // Collapse spaces outside quotes
+                    if prev_was_quote {
+                        // Adjacent quoted strings should be merged without space
+                        if !temp.is_empty() {
+                            result.push(temp.clone());
+                            temp.clear();
+                        }
                     }
-                    space_buffer = false;
-                    result.push(c);
-                    last_was_quoted = false;
+                    temp.push(c);
+                    prev_was_quote = false;
                 }
             }
         }
 
-        println!("{}", result);
+        if !temp.is_empty() {
+            result.push(temp);
+        }
+
+        println!("{}", result.join(" "));
     }
 }
