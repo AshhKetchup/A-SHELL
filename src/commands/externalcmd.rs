@@ -23,6 +23,7 @@ pub fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
                 .create(true)   // Create if not exists
                 .write(true)    // Open for writing
                 .truncate(overwrite) // Overwrite existing content
+                .append(!overwrite)
                 .open(filename).expect("unable to open/create file");
 
             //println!("Redirecting output to: {}", filename);
@@ -44,13 +45,13 @@ pub fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
 
         if let Some(ref mut file) = file {
             if !out.is_empty() && !errtowrite {
-                writeln!(file, "{}", out).map_err(|err| err.to_string())?;
+                writeln!(file, "{}\n", out).map_err(|err| err.to_string())?;
             }
             if !stderr.is_empty() && !errtowrite {
                 println!("{}", stderr);
             }
             if errtowrite && !stderr.is_empty() {
-                writeln!(file, "{}", stderr).map_err(|err| err.to_string())?;
+                writeln!(file, "{}\n", stderr).map_err(|err| err.to_string())?;
             }
             if errtowrite && !out.is_empty() {
                 println!("{}", out);
