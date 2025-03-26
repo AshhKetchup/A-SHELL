@@ -1,3 +1,6 @@
+use std::io::Write;
+use std::fs::OpenOptions;
+
 pub struct Echo;
 
 impl Echo {
@@ -27,12 +30,26 @@ impl Echo {
                 break;
             }
         }
+
         texts.extend_from_slice(&args[i..]);
 
-        let (processed_output, omit_due_to_c) = self.process_texts(&texts, enable_escapes);
+        // code portion for slicing upto '>'
+        let index = texts.iter().position(|s| s == ">" || s == "1>").unwrap_or_else(|| texts.len().saturating_sub(1));
+
+        let new_in = &texts[0..index];
+
+        let (processed_output, omit_due_to_c) = self.process_texts(new_in, enable_escapes);
         let output = processed_output.join(" ");
 
-        if !output.is_empty() {
+        if let Some(filename) = args.get(index+1){
+            let mut file = OpenOptions::new()
+                .create(true)
+                .write(true)
+                .truncate(true).open(filename).expect("unable to open/create file");
+
+            write!(file, "{}", output).expect("unable to write to file");
+        }
+        else if !output.is_empty() {
             print!("{}", output);
         }
 
