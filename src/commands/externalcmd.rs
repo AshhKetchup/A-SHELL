@@ -36,7 +36,7 @@ pub fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
         let stderr = String::from_utf8_lossy(&output.stderr).trim_end_matches('\n').to_string();
 
         if let Some(ref mut file) = file {
-            if !out.is_empty() && stderr.is_empty(){
+            if !out.is_empty() {
                 writeln!(file, "{}", out).map_err(|err| err.to_string())?;
             }
             if !stderr.is_empty() {
