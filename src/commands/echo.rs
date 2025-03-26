@@ -35,7 +35,7 @@ impl Echo {
 
         // code portion for slicing upto '>'
         let index = texts.iter().position(|s| s == ">" || s == "1>" || s == "2>" || s == ">>" || s == "1>>" || s == "2>>").unwrap_or_else(|| texts.len());
-        let mut errwrite = index != texts.len() && args[index] == "2>";
+        let mut errwrite = index != texts.len() && (args[index] == "2>" || args[index] == "2>>");
         let append = index != texts.len() && ( args[index] == ">>" || args[index] == "1>>" || args[index] == "2>>");
         let new_in = &texts[0..index];
         //println!("{:?}", new_in);

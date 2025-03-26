@@ -1,2 +1,4 @@
-ash
-ashh
+cat: fiel: No such file or directory
+
+ls: cannot access 'fiel': No such file or directory
+

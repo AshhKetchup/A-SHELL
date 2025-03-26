@@ -12,7 +12,7 @@ pub fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
     let mut overwrite = true;
     let (new_args, mut file) = if let Some(index) = args.iter().position(|arg| arg.to_string() == ">" || arg.to_string() == "1>" || arg.to_string() == "2>" || arg.to_string() == ">>" || arg.to_string() == "1>>" || arg.to_string() == "2>>")
     {
-        if args[index] == "2>"{
+        if args[index] == "2>" || args[index] == "2>>" {
             errtowrite = true;
         }
         if args[index] == ">>" || args[index] == "1>>" || args[index] == "2>>" {
@@ -51,7 +51,7 @@ pub fn externalcmd(cmd: &str, args: &Vec<&str>) -> Result<(), String>{
                 println!("{}", stderr);
             }
             if errtowrite && !stderr.is_empty() {
-                writeln!(file, "{}\n", stderr).map_err(|err| err.to_string())?;
+                writeln!(file, "{}", stderr).map_err(|err| err.to_string())?;
             }
             if errtowrite && !out.is_empty() {
                 println!("{}", out);
