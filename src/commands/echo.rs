@@ -34,13 +34,13 @@ impl Echo {
         texts.extend_from_slice(&args[i..]);
 
         // code portion for slicing upto '>'
-        let index = texts.iter().position(|s| s == ">" || s == "1>").unwrap_or_else(|| texts.len().saturating_sub(1));
+        let index = texts.iter().position(|s| s == ">" || s == "1>").unwrap_or_else(|| texts.len());
 
         let new_in = &texts[0..index];
-
+        //println!("{:?}", new_in);
         let (processed_output, omit_due_to_c) = self.process_texts(new_in, enable_escapes);
-        let output = processed_output.join(" ");
-
+        let output = processed_output.join(" ").trim_end_matches('\n').to_string();
+        //println!("{}", output);
         if let Some(filename) = args.get(index+1){
             let mut file = OpenOptions::new()
                 .create(true)
@@ -50,12 +50,12 @@ impl Echo {
             write!(file, "{}", output).expect("unable to write to file");
         }
         else if !output.is_empty() {
-            print!("{}", output);
+            print!("{}\n", output);
         }
 
-        if !omit_newline && !omit_due_to_c {
-            println!();
-        }
+        // if !omit_newline && !omit_due_to_c {
+        //     println!();
+        // }
     }
 
     fn split_arguments(&self, input: &str) -> Vec<String> {

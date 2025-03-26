@@ -18,7 +18,7 @@ fn find_executable(cmd_name: &str) -> Option<PathBuf> {
 
 fn parse(input: &str, commands: &HashMap<&str, Box<dyn ShellCommand>>){
     let mut parts: Vec<String>= util::parse_input(input);
-    println!("{:?}", parts);
+    //println!("{:?}", parts);
 
     if parts.is_empty() {
         return;
