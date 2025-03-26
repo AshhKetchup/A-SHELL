@@ -34,8 +34,9 @@ impl Echo {
         texts.extend_from_slice(&args[i..]);
 
         // code portion for slicing upto '>'
-        let index = texts.iter().position(|s| s == ">" || s == "1>").unwrap_or_else(|| texts.len());
-
+        let index = texts.iter().position(|s| s == ">" || s == "1>" || s == "2>").unwrap_or_else(|| texts.len());
+        let mut errwrite = index != texts.len() && args[index] == "2>";
+        let append = index != texts.len() && ( args[index] == ">>" || args[index] == "1>>" || args[index] == "2>>");
         let new_in = &texts[0..index];
         //println!("{:?}", new_in);
         let (processed_output, omit_due_to_c) = self.process_texts(new_in, enable_escapes);
@@ -45,9 +46,13 @@ impl Echo {
             let mut file = OpenOptions::new()
                 .create(true)
                 .write(true)
-                .truncate(true).open(filename).expect("unable to open/create file");
+                .truncate(!append).open(filename).expect("unable to open/create file");
 
-            write!(file, "{}", output).expect("unable to write to file");
+            if !errwrite {
+                write!(file, "{}", output).expect("unable to write to file");
+            }else{
+                print!("{}\n", output);
+            }
         }
         else if !output.is_empty() {
             print!("{}\n", output);
