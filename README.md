@@ -1,35 +1,40 @@
+# A-SHELL
+
+A-SHELL is a custom-built POSIX-compliant shell created with the help of CodeCrafters. This project is part of the ["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview), and it aims to provide a robust foundation for a shell capable of running external programs as well as handling built-in commands.
+
 [![progress-banner](https://backend.codecrafters.io/progress/shell/7ac389f6-9fc0-434f-9bed-9568f944a0df)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
 
-This is a starting point for Rust solutions to the
-["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview).
+## Features
 
-In this challenge, you'll build your own POSIX compliant shell that's capable of
-interpreting shell commands, running external programs and builtin commands like
-cd, pwd, echo and more. Along the way, you'll learn about shell command parsing,
-REPLs, builtin commands, and more.
+- **REPL (Read-Eval-Print Loop):** An interactive shell interface to enter commands.
+- **Basic Commands:**  
+  - `echo` (including support for quoting)
+  - `exit`
+  - `type`
+  - `cd`
+  - **Error Handling:** Gracefully handles errors with informative messages.
+  - **Redirection:** Supports redirection of both stdout and stderr.
+- **Tab Completion:**  
+  - Currently a work in progress – the goal is to implement tab completion using `rustyline`, similar to how readline works in C.
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+## Getting Started
 
-# Passing the first stage
+1. **Prerequisites:**
+   - Ensure you have Rust installed (tested with `cargo 1.82`).
+   
+2. **Running the Shell:**
+   - Use the provided shell script to compile and run the project:
+     ```sh
+     ./your_program.sh
+     ```
+   - The first run may be slow as the project compiles, but subsequent runs will be faster.
 
-The entry point for your `shell` implementation is in `src/main.rs`. Study and
-uncomment the relevant code, and push your changes to pass the first stage:
 
-```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
-```
+## Next Steps
 
-Time to move on to the next stage!
+This shell is a work in progress and further stages will include additional features and improvements. Stay tuned for:
+- Enhanced tab completion
+- Extended built-in command support
+- More robust error handling and feature enhancements
 
-# Stage 2 & beyond
-
-Note: This section is for stages 2 and beyond.
-
-1. Ensure you have `cargo (1.82)` installed locally
-1. Run `./your_program.sh` to run your program, which is implemented in
-   `src/main.rs`. This command compiles your Rust project, so it might be slow
-   the first time you run it. Subsequent runs will be fast.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+---
